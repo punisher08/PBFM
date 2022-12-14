@@ -42,12 +42,14 @@ register_deactivation_hook(PBFILEMANAGEMENT_BASE_DIR,'/PB-Filemanagement.php','p
 function pbfilemanagement_enqueue() {
     wp_enqueue_script('jquery');
     wp_enqueue_script( 'pbfilemanagement',  plugin_dir_url( __FILE__ ) . 'assets/js/main.js',array('jquery'),'1.0.0',true  );
+    wp_enqueue_script( 'simplepagination',  plugin_dir_url( __FILE__ ) . 'assets/js/simple-pagination.js',array('jquery'),'1.0.0',true  );
   
     wp_localize_script('pbfilemanagement','pbfm_localize_script',array(
         'pbfilemanagement_ajax' => admin_url( 'admin-ajax.php' ),
         'pbfilemanagement_nonce' => wp_create_nonce('pbfilemanagement_nonce'),
     ));
     wp_enqueue_style('pbfilemanagement-css',plugin_dir_url( __FILE__ ).'assets/css/styles.css','1','all');        
+    wp_enqueue_style('simplepagination-css',plugin_dir_url( __FILE__ ).'assets/css/simple-pagination.css','1','all');        
     // wp_register_style('pbfilemanagement-css');
 }
 add_action( 'wp_enqueue_scripts', 'pbfilemanagement_enqueue' );
@@ -184,19 +186,67 @@ function pbfm_save_files( $post_id ) {
 }
 add_action( 'save_post', 'pbfm_save_files' );
 
-function callback_pbfm_ajax_call(){
+function callback_filter_category(){
     if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 
         $nonce = $_POST['security'];
         
         if ( empty($_POST) || !wp_verify_nonce( $nonce, 'pbfilemanagement_nonce' ) ) die('An error occurred. Please contact the Administrator.');
-        wp_send_json('success');
+        wp_send_json($_POST['data']);
     }
 }
-add_action( 'wp_ajax_pbfm_ajax_call', 'callback_pbfm_ajax_call' );
-add_action( 'wp_ajax_nopriv_pbfm_ajax_call', 'callback_pbfm_ajax_call' );
+add_action( 'wp_ajax_filter_category', 'callback_filter_category' );
+add_action( 'wp_ajax_nopriv_filter_category', 'callback_filter_category' );
 
 include(PBFILEMANAGEMENT_BASE_DIR.'/shortcodes/pb-shortcode.php');
+
+
+// Register Taxonomy category
+function create_category_tax() {
+
+	$labels = array(
+		'name'              => _x( 'Category', 'taxonomy general name', 'textdomain' ),
+		'singular_name'     => _x( 'Category', 'taxonomy singular name', 'textdomain' ),
+		'search_items'      => __( 'Search Category', 'textdomain' ),
+		'all_items'         => __( 'All Category', 'textdomain' ),
+		'parent_item'       => __( 'Parent Category', 'textdomain' ),
+		'parent_item_colon' => __( 'Parent Category:', 'textdomain' ),
+		'edit_item'         => __( 'Edit Category', 'textdomain' ),
+		'update_item'       => __( 'Update Category', 'textdomain' ),
+		'add_new_item'      => __( 'Add New Category', 'textdomain' ),
+		'new_item_name'     => __( 'New Category Name', 'textdomain' ),
+		'menu_name'         => __( 'Category', 'textdomain' ),
+	);
+	$args = array(
+		'labels' => $labels,
+		'description' => __( '', 'textdomain' ),
+		'hierarchical' => true,
+		'public' => true,
+		'publicly_queryable' => true,
+		'show_ui' => true,
+		'show_in_menu' => true,
+		'show_in_nav_menus' => true,
+		'show_tagcloud' => true,
+		'show_in_quick_edit' => true,
+		'show_admin_column' => false,
+		'show_in_rest' => true,
+	);
+	register_taxonomy( 'pbfm_category', array('pbfm'), $args );
+
+}
+add_action( 'init', 'create_category_tax' );
+
+
+function oawutojao(){
+	$tax_terms = get_terms('pbfm_category', array('hide_empty' => false));
+	$term_ids = get_the_terms(45,'pbfm_category');
+	echo '<pre>';
+	print_r(explode($term_ids));
+	echo '<pre>';
+	die();
+
+}
+// add_action('admin_init','oawutojao');	
 
 
 

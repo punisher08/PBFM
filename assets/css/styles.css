@@ -1,10 +1,23 @@
 .pbfm-dflex{
     display: flex;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     width: 100%;
     flex-wrap: wrap;
     row-gap: 5rem;
 }
 .pbfm-col-3{
     width: 33.33%;
+}
+.ajax-modal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('http://i.stack.imgur.com/FhHRx.gif') 
+                50% 50% 
+                no-repeat;
 }
