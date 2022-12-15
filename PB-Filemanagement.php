@@ -68,36 +68,36 @@ add_action('admin_enqueue_scripts','admin_pbfilemanagement_enqueue');
 function create_pbfm_cpt() {
 
 	$labels = array(
-		'name' => _x( 'PBFM', 'Post Type General Name', 'textdomain' ),
-		'singular_name' => _x( 'PBFM', 'Post Type Singular Name', 'textdomain' ),
-		'menu_name' => _x( 'PBFM', 'Admin Menu text', 'textdomain' ),
-		'name_admin_bar' => _x( 'PBFM', 'Add New on Toolbar', 'textdomain' ),
-		'archives' => __( 'PBFM Archives', 'textdomain' ),
-		'attributes' => __( 'PBFM Attributes', 'textdomain' ),
-		'parent_item_colon' => __( 'Parent PBFM:', 'textdomain' ),
-		'all_items' => __( 'All PBFM', 'textdomain' ),
-		'add_new_item' => __( 'Add New PBFM', 'textdomain' ),
+		'name' => _x( 'Free Resources', 'Post Type General Name', 'textdomain' ),
+		'singular_name' => _x( 'Free Resources', 'Post Type Singular Name', 'textdomain' ),
+		'menu_name' => _x( 'Free Resources', 'Admin Menu text', 'textdomain' ),
+		'name_admin_bar' => _x( 'Free Resources', 'Add New on Toolbar', 'textdomain' ),
+		'archives' => __( 'Free Resources Archives', 'textdomain' ),
+		'attributes' => __( 'Free Resources Attributes', 'textdomain' ),
+		'parent_item_colon' => __( 'Parent Free Resources:', 'textdomain' ),
+		'all_items' => __( 'All Free Resources', 'textdomain' ),
+		'add_new_item' => __( 'Add New Free Resources', 'textdomain' ),
 		'add_new' => __( 'Add New', 'textdomain' ),
-		'new_item' => __( 'New PBFM', 'textdomain' ),
-		'edit_item' => __( 'Edit PBFM', 'textdomain' ),
-		'update_item' => __( 'Update PBFM', 'textdomain' ),
-		'view_item' => __( 'View PBFM', 'textdomain' ),
-		'view_items' => __( 'View PBFM', 'textdomain' ),
-		'search_items' => __( 'Search PBFM', 'textdomain' ),
+		'new_item' => __( 'New Free Resources', 'textdomain' ),
+		'edit_item' => __( 'Edit Free Resources', 'textdomain' ),
+		'update_item' => __( 'Update Free Resources', 'textdomain' ),
+		'view_item' => __( 'View Free Resources', 'textdomain' ),
+		'view_items' => __( 'View Free Resources', 'textdomain' ),
+		'search_items' => __( 'Search Free Resources', 'textdomain' ),
 		'not_found' => __( 'Not found', 'textdomain' ),
 		'not_found_in_trash' => __( 'Not found in Trash', 'textdomain' ),
 		'featured_image' => __( 'Featured Image', 'textdomain' ),
 		'set_featured_image' => __( 'Set featured image', 'textdomain' ),
 		'remove_featured_image' => __( 'Remove featured image', 'textdomain' ),
 		'use_featured_image' => __( 'Use as featured image', 'textdomain' ),
-		'insert_into_item' => __( 'Insert into PBFM', 'textdomain' ),
-		'uploaded_to_this_item' => __( 'Uploaded to this PBFM', 'textdomain' ),
-		'items_list' => __( 'PBFM list', 'textdomain' ),
-		'items_list_navigation' => __( 'PBFM list navigation', 'textdomain' ),
-		'filter_items_list' => __( 'Filter PBFM list', 'textdomain' ),
+		'insert_into_item' => __( 'Insert into Free Resources', 'textdomain' ),
+		'uploaded_to_this_item' => __( 'Uploaded to this Free Resources', 'textdomain' ),
+		'items_list' => __( 'Free Resources list', 'textdomain' ),
+		'items_list_navigation' => __( 'Free Resources list navigation', 'textdomain' ),
+		'filter_items_list' => __( 'Filter Free Resources list', 'textdomain' ),
 	);
 	$args = array(
-		'label' => __( 'PBFM', 'textdomain' ),
+		'label' => __( 'Free Resources', 'textdomain' ),
 		'description' => __( 'create file management system', 'textdomain' ),
 		'labels' => $labels,
 		'menu_icon' => 'dashicons-media-code',
@@ -110,7 +110,7 @@ function create_pbfm_cpt() {
 		'show_in_admin_bar' => true,
 		'show_in_nav_menus' => true,
 		'can_export' => true,
-		'has_archive' => false,
+		'has_archive' => true,
 		'hierarchical' => false,
 		'exclude_from_search' => false,
 		'show_in_rest' => true,
@@ -243,22 +243,27 @@ add_action( 'init', 'create_category_tax' );
 
 
 
-function pbfm_html(){
+function pbfm_html($atts){
 	global $post;
 	$btpgid=get_queried_object_id();
 	$btmetanm=get_post_meta( $btpgid, 'WP_Catid','true' );
 	$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
 
+	$get_term = shortcode_atts( array(
+		'term_id' => null,
+		'per_page' => -1,
+	), $atts );
+
 	$cats = array(
 		'post_type' => 'pbfm',
 		'post_status' => 'publish',
-		'posts_per_page' => 3,
+		'posts_per_page' => $get_term['per_page'],
 		'paged' => $paged,
 		'tax_query' => array(
 			array(
 			  'taxonomy' => 'free_resources',
-			  'field' => '148', //term id
-			  'terms' => 148, //term id
+			  'field' => $get_term['term_id'], //term id
+			  'terms' => $get_term['term_id'], //term id
 			  'include_children' => false
 			)
 		  )
@@ -269,10 +274,10 @@ function pbfm_html(){
 		$html .= '<div class="pbfm-container">';
 			$html .= '<div class="pbfm-dflex pbfm-row">';
         while ( $postslist->have_posts() ) : $postslist->the_post(); 
-		// $meta = get_post_meta($post->ID,'pbfm_uploaded_file');
+		$meta = get_post_meta($post->ID,'pbfm_uploaded_file');
 		$html .= '<div class="pbfm-col-3 download-file">';
 		$terms = '';
-			$html .= '<a href="" target="_blank">';
+			$html .= '<a href="'.$meta[0].'" target="_blank">';
 				$html .=  '<div class="pbfm-img-container">';
 				$html .=  '<img src="https://pinoybuilders.ph/wp-content/uploads/2022/04/Commercial-Architect.jpg" />';
 				$html .= '<p>'.get_the_title($post->ID).'</p>';
@@ -285,16 +290,28 @@ function pbfm_html(){
 			$html .= '<div class="ajax-modal"></div>';
 			$html .= '</div>';
 		$html .= '</div>';
-		$html .= '<div id="pagination-container">';
-		$html .= '<button class="pbfm-pagination-next">'.get_next_posts_link( 'Next &raquo;', $postslist->max_num_pages ).'</button>';
-		$html .= '<button class="pbfm-pagination-prev">'.get_previous_posts_link( 'Previous &raquo;' ).'</button>'; 
-		$html .= wp_reset_postdata();
-		$html .= '</div>';
+		// $html .= '<div id="pagination-container">';
+		// $html .= '<button class="pbfm-pagination-next">'.get_next_posts_link( 'Next &raquo;', $postslist->max_num_pages ).'</button>';
+		// $html .= '<button class="pbfm-pagination-prev">'.get_previous_posts_link( 'Previous &raquo;' ).'</button>'; 
+		// $html .= wp_reset_postdata();
+		// $html .= '</div>';
     endif;
 return $html;
 }
 
 add_shortcode('pbfm','pbfm_html');
+
+function get_custom_post_type_template( $template ) {
+	global $post;
+	$term = get_queried_object();
+	if ( is_tax('free_resources') ) {
+		$term = get_queried_object();
+		$template  = dirname( __FILE__ ) . '/templates/category_template.php';
+		}
+	return $template;
+}
+
+add_filter( 'template_include', 'get_custom_post_type_template' ) ;
 
 
 
