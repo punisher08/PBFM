@@ -163,14 +163,18 @@ function wp_custom_attachment() {
     $html = '<p class="description">';
     $html .= 'Upload your File here.';
     $html .= '</p>';
+   
     if(!empty($file[0])){
-        $html .= '<input id="pbfm_uploaded_file" type="text" name="pbfm_uploaded_file" value="'.$file[0].'"style="width:100%; border:none;"/>';
+        $html .= '<input id="pbfm_uploaded_file" type="text" name="pbfm_uploaded_file" value="'.$file[0].'" style="width:80%; margin:auto;"/>';
     }else{
-        $html .= '<input id="pbfm_uploaded_file" type="text" name="pbfm_uploaded_file" style="width:100%; border:none;"/>';
+        $html .= '<input id="pbfm_uploaded_file" type="text" name="pbfm_uploaded_file" style="width:80%; margin:auto;" />';
     }
+ 
     $html .= '<br />';
     $html .= '<br />';
+    $html .= '<div class="pbfm-btn">';
     $html .= '<input id="wp_custom_attachment" type="button" value="Upload File" />';
+    $html .= '</div>';
      
     echo $html;
  
@@ -182,7 +186,7 @@ function pbfm_save_files( $post_id ) {
 	if ( isset( $_POST['pbfm_uploaded_file'] ) ){
 		update_post_meta( $post_id, 'pbfm_uploaded_file', esc_attr( $_POST['pbfm_uploaded_file'] ) );
 	}
-
+	
 }
 add_action( 'save_post', 'pbfm_save_files' );
 
@@ -237,17 +241,60 @@ function create_category_tax() {
 add_action( 'init', 'create_category_tax' );
 
 
-function oawutojao(){
-	$tax_terms = get_terms('pbfm_category', array('hide_empty' => false));
-	$term_ids = get_the_terms(45,'pbfm_category');
-	echo '<pre>';
-	print_r(explode($term_ids));
-	echo '<pre>';
-	die();
 
+
+function pbfm_html(){
+	global $post;
+	$btpgid=get_queried_object_id();
+	$btmetanm=get_post_meta( $btpgid, 'WP_Catid','true' );
+	$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+
+	$cats = array(
+		'post_type' => 'pbfm',
+		'post_status' => 'publish',
+		'posts_per_page' => 3,
+		'paged' => $paged,
+		'tax_query' => array(
+			array(
+			  'taxonomy' => 'pbfm_category',
+			  'field' => '143', //term id
+			  'terms' => 143, //term id
+			  'include_children' => false
+			)
+		  )
+	);
+	$postslist = new WP_Query( $cats );
+	if ( $postslist->have_posts() ) :
+		$html = '';
+		$html .= '<div class="pbfm-container">';
+			$html .= '<div class="pbfm-dflex pbfm-row">';
+        while ( $postslist->have_posts() ) : $postslist->the_post(); 
+		// $meta = get_post_meta($post->ID,'pbfm_uploaded_file');
+		$html .= '<div class="pbfm-col-3 download-file">';
+		$terms = '';
+			$html .= '<a href="" target="_blank">';
+				$html .=  '<div class="pbfm-img-container">';
+				$html .=  '<img src="https://pinoybuilders.ph/wp-content/uploads/2022/04/Commercial-Architect.jpg" />';
+				$html .= '<p>'.get_the_title($post->ID).'</p>';
+				$html .= '<i class="fa fa-arrow-circle-down" aria-hidden="true"></i>';
+				$html .= '</div>';
+			$html .= '</a>';
+		$html .= '</div>';
+         endwhile;  
+
+			$html .= '<div class="ajax-modal"></div>';
+			$html .= '</div>';
+		$html .= '</div>';
+		$html .= '<div id="pagination-container">';
+		$html .= '<button class="pbfm-pagination-next">'.get_next_posts_link( 'Next &raquo;', $postslist->max_num_pages ).'</button>';
+		$html .= '<button class="pbfm-pagination-prev">'.get_previous_posts_link( 'Previous &raquo;' ).'</button>'; 
+		$html .= wp_reset_postdata();
+		$html .= '</div>';
+    endif;
+return $html;
 }
-// add_action('admin_init','oawutojao');	
 
+add_shortcode('pbfm','pbfm_html');
 
 
 

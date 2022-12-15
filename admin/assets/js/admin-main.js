@@ -1,5 +1,6 @@
 jQuery(document).ready(function($) {
-    $('#wp_custom_attachment').click(function() {
+    $('.pbfm-btn #wp_custom_attachment').click(function(e) {
+        // e.preventDefault()
         tb_show( '', 'media-upload.php?type=image&amp;TB_iframe=true' );
         window.send_to_editor = function(html) {
         if($(html).attr('href')){
