@@ -235,7 +235,7 @@ function create_category_tax() {
 		'show_admin_column' => false,
 		'show_in_rest' => true,
 	);
-	register_taxonomy( 'pbfm_category', array('pbfm'), $args );
+	register_taxonomy( 'free_resources', array('pbfm'), $args );
 
 }
 add_action( 'init', 'create_category_tax' );
@@ -256,9 +256,9 @@ function pbfm_html(){
 		'paged' => $paged,
 		'tax_query' => array(
 			array(
-			  'taxonomy' => 'pbfm_category',
-			  'field' => '143', //term id
-			  'terms' => 143, //term id
+			  'taxonomy' => 'free_resources',
+			  'field' => '148', //term id
+			  'terms' => 148, //term id
 			  'include_children' => false
 			)
 		  )

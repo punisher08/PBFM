@@ -4,7 +4,7 @@
      */
     ob_start();
     function print_cpt_categories(){
-        $tax_terms = get_terms('pbfm_category', array('hide_empty' => false));
+        $tax_terms = get_terms('free_resources', array('hide_empty' => false));
         $html = '';
         $html .= '<div class="pbfm-cat-list-container">';
             $html .= '<div class="pbfm-cat-list">';
